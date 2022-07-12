@@ -5,6 +5,7 @@ public class WiseSay {
     private int id;
     private String content;
     private String author;
+    private WiseSay(){}
 
     public WiseSay(int id, String content, String author) {
         this.id = id;

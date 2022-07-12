@@ -7,44 +7,40 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class WiseSayRepository {
+    private final MyJsonParser parser;
     private final String path;
     private Map<Integer,WiseSay> wiseSayMap = new HashMap<>();
     private int idx; //현재 번호
 
-    public WiseSayRepository(String path){
+    public WiseSayRepository(String path,MyJsonParser parser){
+        this.parser = parser;
         this.path = path;
         idx = load(this.path);
     }
 
     private int load(String path){
         int max = 1;
-        File[] datas = new File(path).listFiles();
-        if(datas == null || datas.length == 0) return 1; //데이터가 없어서 인덱스 1 반환
-        for(File data : datas){
-            max = Math.max(Integer.parseInt(data.getName().split("\\.")[0]),max);
-
-            try(BufferedReader br = new BufferedReader(new FileReader(data));){
-                StringBuilder sb = new StringBuilder();
-                String line = "";
-                while((line=br.readLine()) != null) sb.append(line);
-                WiseSay wiseSay = MyJsonParser.toWiseSay(sb.toString());
-                wiseSayMap.put(wiseSay.getId(), wiseSay);
-
-            }catch (Exception e){
-                throw new RuntimeException(e);
-            }
+        File f = new File(path);
+        if(!f.exists()){
+            System.out.println("data.json 파일이 존재하지 않습니다.");
+            return 1;
         }
+        try(BufferedReader br = new BufferedReader(new FileReader(f))){
+            StringBuilder sb = new StringBuilder();
+            String line = "";
+            while((line=br.readLine()) != null) sb.append(line);
+            wiseSayMap = parser.toWiseSayList(sb.toString());
+        }catch (Exception e){
+            throw new RuntimeException(e);
+        }
+        for(int t : wiseSayMap.keySet()) max = Math.max(max,t);
         return max;
     }
 
     public int save(String content,String author){
         WiseSay say = new WiseSay(++idx,content,author);
-        try(BufferedWriter bw = new BufferedWriter(new FileWriter(this.path+idx+".json"))){
-            bw.write(MyJsonParser.toJson(say));
-        }catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         this.wiseSayMap.put(idx,say);
+        syncData();
         return idx;
     }
 
@@ -57,20 +53,21 @@ public class WiseSayRepository {
     }
 
     public void remove(int id){
-        File f = new File(this.path+id+".json");
-        boolean delete = f.delete();
-        if(!delete) throw new RuntimeException("파일 실패 삭제");
         wiseSayMap.remove(id);
+        syncData();
     }
     public void edit(int id,String content){
-        try(BufferedWriter bw = new BufferedWriter(new FileWriter(this.path+id+".json"))){
-            WiseSay wiseSay = getOne(id);
-            wiseSay.setContent(content);
-            bw.write(MyJsonParser.toJson(wiseSay));
-        }catch (IOException e){
-            throw new RuntimeException("파일 수정 실패");
-        }
+        WiseSay wiseSay = getOne(id);
+        wiseSay.setContent(content);
+        syncData();
     }
 
+    private void syncData(){
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(this.path))){
+            bw.write(parser.toJsonArray(this.wiseSayMap));
+        }catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
