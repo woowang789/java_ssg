@@ -1,5 +1,8 @@
 package com.woowang.ssg;
 
+import com.woowang.ssg.Parser.JacksonJsonParser;
+import com.woowang.ssg.Parser.JsonParser;
+
 import java.io.*;
 import java.util.HashMap;
 import java.util.List;
@@ -7,12 +10,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class WiseSayRepository {
-    private final MyJsonParser parser;
+    private final JsonParser parser;
     private final String path;
     private Map<Integer,WiseSay> wiseSayMap = new HashMap<>();
     private int idx; //현재 번호
 
-    public WiseSayRepository(String path,MyJsonParser parser){
+    public WiseSayRepository(String path, JsonParser parser){
         this.parser = parser;
         this.path = path;
         idx = load(this.path);
@@ -48,7 +51,8 @@ public class WiseSayRepository {
         return wiseSayMap.getOrDefault(id,null);
     }
     public List<WiseSay> getAll(){
-        return wiseSayMap.entrySet().stream().sorted((o1, o2) -> o2.getKey()-o1.getKey())
+        return wiseSayMap.entrySet().stream()
+                .sorted((o1, o2) -> o2.getKey()-o1.getKey())
                 .map(Map.Entry::getValue).collect(Collectors.toList());
     }
 

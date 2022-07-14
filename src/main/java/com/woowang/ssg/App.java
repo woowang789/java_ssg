@@ -2,9 +2,6 @@ package com.woowang.ssg;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.List;
-import java.util.Map;
 
 public class App {
     private final WiseSayController controller;
@@ -24,16 +21,16 @@ public class App {
 
             switch (cmd.getPath()){
                 case "등록":
-                    controller.saveWiseSay();
+                    controller.saveCmd();
                     break;
                 case "목록":
-                    controller.getWiseSayList();
+                    controller.listCmd();
                     break;
                 case "삭제":
-                    controller.removeWiseSay(cmd.getQuery());
+                    controller.removeCmd(cmd.getQuery());
                     break;
                 case "수정":
-                    controller.editWiseSay(cmd.getQuery());
+                    controller.editCmd(cmd.getQuery());
                     break;
                 case "종료":
                     break outer;

@@ -1,4 +1,4 @@
-package com.woowang.ssg;
+package com.woowang.ssg.Parser;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,11 +7,12 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.woowang.ssg.WiseSay;
 
-public class MyJsonParser {
+public class JacksonJsonParser implements JsonParser {
     private ObjectMapper mapper = new ObjectMapper();
 
-    public Map<Integer,WiseSay> toWiseSayList(String str){
+    public Map<Integer, WiseSay> toWiseSayList(String str){
         try {
             Map<Integer,WiseSay> map = new HashMap<>();
             WiseSay[] wiseSays = mapper.readValue(str,WiseSay[].class);
